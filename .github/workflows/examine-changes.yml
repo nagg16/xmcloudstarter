@@ -86,19 +86,19 @@ jobs:
           echo "outputs.current_branch = ${{steps.branch.outputs.current_branch}}"
           echo "github_event_name = ${{github.event_name}}"
           echo "environment_name = ${{steps.deployable.outputs.environment_name}}"
-  # sonarcloud:
-  #  name: sonarcloud
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #      with:
-  #        fetch-depth: 0 # shallow clones should be disabled for a better relevancy of analysis
-  #    - name: sonarcloud scan
-  #      uses: sonarsource/sonarcloud-github-action@master
-  #      env:
-  #        github_token: ${{ secrets.github_token }} # needed to get pr information, if any
-  #        sonar_token: ${{ vars.sonar_token_var }}
-  #      with:
-  #        args: >
-  #          -dsonar.organization=gowling-ca-digital-experience-project
-  #          -dsonar.projectkey=gowling-ca-digital-experience-project_gowlingwlg
+  sonarcloud:
+    name: sonarcloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # shallow clones should be disabled for a better relevancy of analysis
+      - name: sonarcloud scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          github_token: ${{ secrets.github_token }} # needed to get pr information, if any
+          sonar_token: ${{ vars.sonar_token_var }}
+        with:
+          args: >
+            -dsonar.organization=nagg16
+            -dsonar.projectkey=nagg16_xmcloudstarter

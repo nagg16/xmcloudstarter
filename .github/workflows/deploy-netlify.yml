@@ -1,0 +1,23 @@
+name: Deploy to Netlify
+
+on:
+  workflow_call:
+    inputs:
+      environment_name:
+        required: true
+        type: string
+    secrets:
+      NETLIFY_BUILD_HOOK:
+        required: true
+      
+
+jobs:
+  deploy:
+    name: ${{ inputs.environment_name }}
+    environment: ${{ inputs.environment_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Netlify
+        uses: actions/checkout@v3
+      - name: Deployed site 
+        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK }}

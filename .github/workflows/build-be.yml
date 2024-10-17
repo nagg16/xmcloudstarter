@@ -1,0 +1,47 @@
+name: Backend Build
+
+on:
+  workflow_call:
+    inputs:
+      buildConfiguration:
+        required: true
+        type: string
+      environment_name:
+        required: true
+        type: string
+      is_deployable:
+        required: true
+        type: string
+      current_branch:
+        required: true
+        type: string
+    outputs:
+      environment_name:
+        description: 'environment'
+        value: ${{ inputs.environment_name }}
+      is_deployable:
+        description: 'Is deployable'
+        value: ${{ inputs.is_deployable }}
+      current_branch:
+        description: 'current branch'
+        value: ${{ inputs.current_branch }}
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup MSBuild path
+        uses: microsoft/setup-msbuild@v1.3
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.2.0
+      - name: Restore NuGet packages
+        run: nuget restore XmCloudSXAStarter.sln
+
+      - name: Build
+        shell: powershell
+        run: msbuild XmCloudSXAStarter.sln /p:Configuration=${{ inputs.buildConfiguration }}
+
+      #- name: Execute unit tests
+      #  uses: ./.github/actions/be-unit-tests

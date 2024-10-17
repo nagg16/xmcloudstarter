@@ -1,0 +1,20 @@
+name: Backend Deploy
+
+on:  
+  workflow_call:
+    inputs:
+      environment_name:
+        required: true
+        type: string
+  workflow_dispatch:
+
+jobs:
+  cloud:
+    uses: ./.github/workflows/deploy-xm-cloud.yml
+    with:
+      environment_name: ${{ inputs.environment_name }}
+    secrets:
+      XM_CLOUD_ORG_CLIENT_SECRET: ${{ secrets.XM_CLOUD_ORG_CLIENT_SECRET }}
+      XM_CLOUD_ORG_CLIENT_ID: ${{ secrets.XM_CLOUD_ORG_CLIENT_ID }}
+      XM_CLOUD_ENVIRONMENT_ID: ${{ secrets.XM_CLOUD_ENVIRONMENT_ID }}
+      

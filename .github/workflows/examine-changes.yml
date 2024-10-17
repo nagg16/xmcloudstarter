@@ -1,0 +1,104 @@
+name: Examine changes
+
+on:
+  workflow_call:
+    outputs:
+      BE_Changes:
+        description: 'BE changes'
+        value: ${{jobs.check.outputs.BE_updated_status}}
+      FE_Changes:
+        description: 'FE changes'
+        value: ${{jobs.check.outputs.FE_updated_status}}
+      Is_deployable:
+        description: 'Is deployable'
+        value: ${{jobs.check.outputs.Is_deployable_status}}
+      Current_branch_value:
+        description: 'Will be used as environment name'
+        value: ${{jobs.check.outputs.Current_branch_name}}
+      Environment_name:
+        description: 'Environment name'
+        value: ${{jobs.check.outputs.Environment_name_value}}
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      BE_updated_status: ${{steps.changes.outputs.be_updated}}
+      FE_updated_status: ${{steps.changes.outputs.fe_updated}}
+      Is_deployable_status: ${{steps.deployable.outputs.is_deployable}}
+      Current_branch_name: ${{steps.branch.outputs.current_branch}}
+      Environment_name_value: ${{steps.deployable.outputs.environment_name}}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Check for changes
+        shell: bash
+        id: changes
+        run: |
+          if [ -n "$(git diff HEAD HEAD^ -- ':!./src/train/' )" ]; then
+              echo "be_updated=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "be_updated=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -n "$(git diff HEAD HEAD^ -- './src/train/' './.github')" ]; then
+              echo "fe_updated=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "fe_updated=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Current branch
+        shell: bash
+        id: branch
+        run: |
+          if [[ "${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            branch_name=${GITHUB_REF##*/}
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            branch_name=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | jq -r .head.ref)
+          else
+            echo "Unsupported event: ${{ github.event_name }}"
+            exit 1
+          fi
+          if [ $branch_name == 'main' ]; then
+            echo "current_branch=prod" >> "$GITHUB_OUTPUT"
+          else
+            echo "current_branch=$branch_name" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deployable branch
+        shell: bash
+        id: deployable
+        run: |
+          branch_name=${{steps.branch.outputs.current_branch}}
+          echo "branch_name=$branch_name"
+          if [[ ( $branch_name == "dev" || $branch_name == "qa" || $branch_name == "prod" ) &&
+            ( "${{ github.event_name }}" == "push" || ${{ github.event_name }} == 'workflow_dispatch' )  ]]; then
+              echo "is_deployable=true" >> "$GITHUB_OUTPUT"
+              echo "environment_name=$branch_name" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_deployable=false" >> "$GITHUB_OUTPUT"
+            echo "environment_name=dev" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Print status
+        run: |
+          echo "outputs.be_updated = ${{steps.changes.outputs.be_updated}}"
+          echo "outputs.fe_updated = ${{steps.changes.outputs.fe_updated}}"
+          echo "outputs.is_deployable = ${{steps.deployable.outputs.is_deployable}}"
+          echo "outputs.current_branch = ${{steps.branch.outputs.current_branch}}"
+          echo "github_event_name = ${{github.event_name}}"
+          echo "environment_name = ${{steps.deployable.outputs.environment_name}}"
+  # sonarcloud:
+  #  name: sonarcloud
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v4
+  #      with:
+  #        fetch-depth: 0 # shallow clones should be disabled for a better relevancy of analysis
+  #    - name: sonarcloud scan
+  #      uses: sonarsource/sonarcloud-github-action@master
+  #      env:
+  #        github_token: ${{ secrets.github_token }} # needed to get pr information, if any
+  #        sonar_token: ${{ vars.sonar_token_var }}
+  #      with:
+  #        args: >
+  #          -dsonar.organization=gowling-ca-digital-experience-project
+  #          -dsonar.projectkey=gowling-ca-digital-experience-project_gowlingwlg

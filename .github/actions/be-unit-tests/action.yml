@@ -1,0 +1,32 @@
+name: Execute Unit Tests
+description: "Execute Unit Tests"
+
+env:
+  BUILD_CONFIG: 'Release'
+  UnitTestsSLN: pathToUnitTestsSolution #replace with actual path
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.x
+
+
+    #- name: Restore dependencies
+    #  run: dotnet restore $env:UnitTestsSLN
+
+    #- name: Build
+    #  run: dotnet build $env:UnitTestsSLN --configuration $env:BUILD_CONFIG
+      
+    #- name: Test
+    #  run: dotnet test $env:UnitTestsSLN --configuration $env:BUILD_CONFIG --logger "trx;LogFileName=test-results.trx" || true
+      
+    #- name: Test Report
+    #  uses: dorny/test-reporter@v1
+    #  if: always()
+    #  with:
+    #    name: DotNET Tests
+    #    path: "**/test-results.trx"                            
+    #    reporter: dotnet-trx
+    #    fail-on-error: true

@@ -1,0 +1,33 @@
+name: Limit Branch Creation and Enforce Naming Convention
+description: "Github action to enforce naming convention on branch names"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Branch name on push event
+      if: "${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch'}}"
+      id: push_event
+      run: |
+        branch_name=${{ github.ref_name }}
+        if ! [[ $branch_name == "dev" || $branch_name == "qa" || $branch_name == "main" ||
+            $branch_name =~ (hotfix|bugfix|feature)\/TJC-[0-9]+(-[0-9])+(-([a-zA-Z])+([\da-zA-Z-])*)* ]]; then
+          echo "Branch name '$branch_name' does not match the pattern. Please check the branching strategy."
+          echo "https://edynamics.sharepoint.com/:w:/r/sites/TheJointCommission-WebsiteModernization/_layouts/15/Doc.aspx?sourcedoc=%7BC27B8EFE-C70F-4CF8-B967-F506431C1E41%7D&file=BranchingStrategy.docx&action=default&mobileredirect=true"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Branch name on PR event
+      id: pr_event
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        pr_event_name=${{github.event_name}}
+        echo "$pr_event_name"
+        branch_name=${{ github.head_ref }}
+        if ! [[ $branch_name == "dev" || $branch_name == "qa" || $branch_name == "main" ||
+            $branch_name =~ (hotfix|bugfix|feature)\/TJC-[0-9]+(-[0-9])+(-([a-zA-Z])+([\da-zA-Z-])*)* ]]; then
+          echo "Branch name '$branch_name' does not match the pattern. Please check the branching strategy."
+          echo "https://edynamics.sharepoint.com/:w:/r/sites/TheJointCommission-WebsiteModernization/_layouts/15/Doc.aspx?sourcedoc=%7BC27B8EFE-C70F-4CF8-B967-F506431C1E41%7D&file=BranchingStrategy.docx&action=default&mobileredirect=true"
+          exit 1
+        fi
+      shell: bash

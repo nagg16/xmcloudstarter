@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ "dev", "qa", "main", "feature/**", "hotfix/**", "bugfix/**" ]
+  pull_request:
+    branches: [ "dev", "qa", "main", "feature/**", "hotfix/**", "bugfix/**" ]
+    types: [ "closed" ]
+  workflow_call:  
+  workflow_dispatch:
+
+jobs:
+  policy:
+    uses: ./.github/workflows/branch-naming-policy.yml
+
+  changes:
+    needs: policy
+    uses: ./.github/workflows/examine-changes.yml
+      
+  build-fe:
+    needs: changes
+    if: ${{ needs.changes.outputs.FE_Changes == 'true' }}
+    secrets: inherit
+    uses: ./.github/workflows/build-fe.yml
+    with:
+      is_deployable: ${{ needs.changes.outputs.Is_deployable }}
+      environment_name: ${{ needs.changes.outputs.Environment_name }}
+
+  build-be:
+    needs: changes
+    if: ${{ needs.changes.outputs.BE_Changes == 'true' }}
+    secrets: inherit
+    uses: ./.github/workflows/build-be.yml
+    with:
+      buildConfiguration: Release
+      is_deployable: ${{ needs.changes.outputs.Is_deployable }}
+      environment_name: ${{ needs.changes.outputs.Environment_name }}
+      current_branch: ${{ needs.changes.outputs.Current_branch_value }}
+
+  # deploy-fe:
+  #  needs: build-fe
+  #  if: ${{ needs.build-fe.outputs.Is_deployable == 'true' }}
+  #  secrets: inherit
+  #  uses: ./.github/workflows/deploy-fe.yml
+  #  with:
+  #    environment_name: ${{ needs.build-fe.outputs.environment_name }}
+  
+  # deploy-be:
+  #   needs: build-be
+  #   if: ${{ needs.build-be.outputs.is_deployable == 'true'}}
+  #   secrets: inherit
+  #   uses: ./.github/workflows/deploy-be.yml
+  #   with:
+  #     environment_name: ${{ needs.build-be.outputs.environment_name }}

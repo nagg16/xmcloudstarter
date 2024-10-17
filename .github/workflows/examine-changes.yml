@@ -37,12 +37,12 @@ jobs:
         shell: bash
         id: changes
         run: |
-          if [ -n "$(git diff HEAD HEAD^ -- ':!./src/train/' )" ]; then
+          if [ -n "$(git diff HEAD HEAD^ -- ':!./src/sxastarter/' )" ]; then
               echo "be_updated=true" >> "$GITHUB_OUTPUT"
           else
               echo "be_updated=false" >> "$GITHUB_OUTPUT"
           fi
-          if [ -n "$(git diff HEAD HEAD^ -- './src/train/' './.github')" ]; then
+          if [ -n "$(git diff HEAD HEAD^ -- './src/sxastarter/' './.github')" ]; then
               echo "fe_updated=true" >> "$GITHUB_OUTPUT"
           else
               echo "fe_updated=false" >> "$GITHUB_OUTPUT"

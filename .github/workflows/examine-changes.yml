@@ -98,7 +98,3 @@ jobs:
         env:
           github_token: ${{ secrets.github_token }} # needed to get pr information, if any
           sonar_token: ${{ secrets.sonar_token }}
-        with:
-          args: >
-            -dsonar.organization=nagg16
-            -dsonar.projectkey=nagg16_xmcloudstarter

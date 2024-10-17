@@ -97,7 +97,7 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@master
         env:
           github_token: ${{ secrets.github_token }} # needed to get pr information, if any
-          sonar_token: ${{ vars.sonar_token_var }}
+          sonar_token: ${{ secrets.sonar_token }}
         with:
           args: >
             -dsonar.organization=nagg16

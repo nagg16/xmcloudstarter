@@ -1,6 +1,8 @@
-import { GetServerSidePropsContext, GetStaticPropsContext } from 'next';
 import { SitecorePageProps } from 'lib/page-props';
+import { GetServerSidePropsContext, GetStaticPropsContext } from 'next';
 import * as plugins from 'temp/page-props-factory-plugins';
+
+import { debug } from '@sitecore-jss/sitecore-jss-nextjs';
 
 /**
  * Determines whether context is GetServerSidePropsContext (SSR) or GetStaticPropsContext (SSG)
@@ -35,6 +37,9 @@ export class SitecorePagePropsFactory {
   public async create(
     context: GetServerSidePropsContext | GetStaticPropsContext
   ): Promise<SitecorePageProps> {
+    const startTimestamp = Date.now();
+    debug.common('page-props-factory start');
+
     const extendedProps = await (Object.values(plugins) as Plugin[])
       .sort((p1, p2) => p1.order - p2.order)
       .reduce(async (result, plugin) => {
@@ -42,6 +47,8 @@ export class SitecorePagePropsFactory {
         const newProps = await plugin.exec(props, context);
         return newProps;
       }, Promise.resolve({} as SitecorePageProps));
+
+    debug.common('page-props-factory end in %dms', Date.now() - startTimestamp);
 
     return extendedProps;
   }

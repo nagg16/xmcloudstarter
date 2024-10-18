@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "mhutchie.git-graph",
+    "GraphQL.vscode-graphql",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "pkief.material-icon-theme",
+    "bradlc.vscode-tailwindcss",
+    "mikestead.dotenv",
+    "redhat.vscode-yaml"
+  ]
+}

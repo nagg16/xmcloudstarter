@@ -1,13 +1,16 @@
-import { ComponentPropsService } from '@sitecore-jss/sitecore-jss-nextjs';
 import { SitecorePageProps } from 'lib/page-props';
 import { GetServerSidePropsContext, GetStaticPropsContext } from 'next';
-import { componentModule } from 'temp/componentFactory';
-import { Plugin, isServerSidePropsContext } from '..';
+import { moduleFactory } from 'temp/componentBuilder';
+
+import { ComponentPropsError, ComponentPropsService } from '@sitecore-jss/sitecore-jss-nextjs';
+
+import { isServerSidePropsContext, Plugin } from '..';
 
 class ComponentPropsPlugin implements Plugin {
   private componentPropsService: ComponentPropsService;
 
-  order = 1;
+  // Make sure to run this plugin last to ensure that the updated layout data is used
+  order = 10;
 
   constructor() {
     this.componentPropsService = new ComponentPropsService();
@@ -21,14 +24,28 @@ class ComponentPropsPlugin implements Plugin {
       props.componentProps = await this.componentPropsService.fetchServerSideComponentProps({
         layoutData: props.layoutData,
         context,
-        componentModule,
+        moduleFactory,
       });
     } else {
       props.componentProps = await this.componentPropsService.fetchStaticComponentProps({
         layoutData: props.layoutData,
         context,
-        componentModule,
+        moduleFactory,
       });
+    }
+
+    const errors = Object.keys(props.componentProps)
+      .map((id) => {
+        const component = props.componentProps[id] as ComponentPropsError;
+
+        return component.error
+          ? `\nUnable to get component props for ${component.componentName} (${id}): ${component.error}`
+          : '';
+      })
+      .join('');
+
+    if (errors.length) {
+      throw new Error(errors);
     }
 
     return props;

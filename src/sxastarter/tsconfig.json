@@ -2,10 +2,27 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "components/*": ["src/components/*"],
-      "lib/*": ["src/lib/*"],
-      "temp/*": ["src/temp/*"],
-      "assets/*": ["src/assets/*"]
+      "components/*": [
+        "src/components/*"
+      ],
+      "lib/*": [
+        "src/lib/*"
+      ],
+      "temp/*": [
+        "src/temp/*"
+      ],
+      "assets/*": [
+        "src/assets/*"
+      ],
+      "graphql-types": [
+        "node_modules/@types/graphql-let/__generated__/__types__"
+      ],
+      "react": [
+        "node_modules/react"
+      ],
+      "@/*": [
+        "src/*"
+      ]
     },
     "target": "es5",
     "lib": [
@@ -17,7 +34,6 @@
     "skipLibCheck": true,
     "strict": true,
     "strictFunctionTypes": false,
-    "forceConsistentCasingInFileNames": true,
     "downlevelIteration": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -31,14 +47,16 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "incremental": true,
+    "forceConsistentCasingInFileNames": false
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-  ],
-  "exclude": [
-    "node_modules"
+    "**/*.tsx"
   ]
 }

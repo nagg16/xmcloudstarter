@@ -28,15 +28,15 @@
 
 name: SonarCloud analysis
 
-#on:
-#  push:
-#    branches: [ "main" ]
-#  pull_request:
-#    branches: [ "main" ]
-#  workflow_dispatch:
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
-#permissions:
-#  pull-requests: read # allows SonarCloud to decorate PRs with analysis results
+permissions:
+  pull-requests: read # allows SonarCloud to decorate PRs with analysis results
 
 jobs:
   Analysis:

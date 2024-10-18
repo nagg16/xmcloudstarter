@@ -86,8 +86,9 @@ jobs:
           echo "outputs.current_branch = ${{steps.branch.outputs.current_branch}}"
           echo "github_event_name = ${{github.event_name}}"
           echo "environment_name = ${{steps.deployable.outputs.environment_name}}"
-  sonarcloud:
-    uses: ./.github/workflows/sonarcloud.yml
+  #sonarcloud:
+    
+  # uses: ./.github/workflows/sonarcloud.yml
   #  name: sonarcloud
   #  runs-on: ubuntu-latest
   #  steps:
@@ -98,3 +99,5 @@ jobs:
   #      uses: sonarsource/sonarcloud-github-action@master
   #      env:
   #        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+     
